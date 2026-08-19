@@ -1,0 +1,10 @@
+zameen_links_*.csv
+zameen_links_*.csv.done_areas.txt
+zameen_details_*.csv
+zameen_leaf_areas_*.json
+zameen_trend_history.csv
+zameen_listing_trend_map.csv
+debug_failed_sample_*.txt
+BACKUP_*/
+__pycache__/
+*.pyc
