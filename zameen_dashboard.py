@@ -505,13 +505,13 @@ if page == "🏠 Overview":
         city_counts.columns = ["city", "count"]
         city_counts = add_pct_labels(city_counts)
         st.plotly_chart(bar_with_labels(city_counts, "city", "count", "City", "Listings", text="label"),
-                        use_container_width=True)
+                        width="stretch")
     with c2:
         st.subheader("② Property Type Split")
         if "type" in listings.columns:
             tc = listings["type"].value_counts().reset_index()
             tc.columns = ["type", "count"]
-            st.plotly_chart(pie_with_labels(tc, "type", "count"), use_container_width=True)
+            st.plotly_chart(pie_with_labels(tc, "type", "count"), width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:
@@ -520,7 +520,7 @@ if page == "🏠 Overview":
         pb.columns = ["bucket", "count"]
         pb = add_pct_labels(pb)
         st.plotly_chart(bar_with_labels(pb, "bucket", "count", "Price Range", "Listings", text="label"),
-                        use_container_width=True)
+                        width="stretch")
     with c2:
         st.subheader("④ Bedrooms Distribution")
         if "bedrooms" in listings.columns:
@@ -528,13 +528,13 @@ if page == "🏠 Overview":
             bc.columns = ["bedrooms", "count"]
             bc = add_pct_labels(bc)
             st.plotly_chart(bar_with_labels(bc, "bedrooms", "count", "Bedrooms", "Listings", text="label"),
-                            use_container_width=True)
+                            width="stretch")
 
     st.subheader("⑤ Overall Market Price Trend")
     if "trend_id" in listings.columns:
         monthly = trend_line_for(listings["trend_id"].dropna().unique(), trend_history)
         if not monthly.empty:
-            st.plotly_chart(price_trend_figure(monthly), use_container_width=True)
+            st.plotly_chart(price_trend_figure(monthly), width="stretch")
         else:
             st.info("No trend data available yet.")
 
@@ -565,7 +565,7 @@ if page == "🏠 Overview":
                 ), rangeslider=dict(visible=False),
             ),
         )
-        st.plotly_chart(fig_city_trend, use_container_width=True)
+        st.plotly_chart(fig_city_trend, width="stretch")
 
     st.subheader("⑦ Price Change by City — Last Month / 6M / 1Y / 2Y")
     if "trend_id" in listings.columns and "city" in listings.columns and not trend_history.empty:
@@ -587,7 +587,7 @@ if page == "🏠 Overview":
                 "2-Year %": round(city_rows["trend_change_pct_2yr"].mean(), 1) if "trend_change_pct_2yr" in city_rows.columns else None,
             })
         change_df = pd.DataFrame(rows)
-        st.dataframe(change_df, use_container_width=True, hide_index=True)
+        st.dataframe(change_df, width="stretch", hide_index=True)
         st.caption("Last Month % is computed directly from the monthly price history; "
                    "6M/1Y/2Y % come from Zameen's own price index for each listing, averaged per city.")
 
@@ -598,14 +598,14 @@ if page == "🏠 Overview":
             tp = listings.dropna(subset=["type", "price_numeric"]).groupby("type")["price_numeric"].mean().reset_index()
             tp["label"] = tp["price_numeric"].apply(fmt_price_short)
             st.plotly_chart(bar_with_labels(tp, "type", "price_numeric", "Property Type", "Avg Price", text="label"),
-                            use_container_width=True)
+                            width="stretch")
     with c2:
         st.subheader("⑨ Average Price by City")
         cp = listings.dropna(subset=["city", "price_numeric"]).groupby("city")["price_numeric"].mean().reset_index()
         cp["label"] = cp["price_numeric"].apply(fmt_price_short)
         cp = cp.sort_values("price_numeric", ascending=False)
         st.plotly_chart(bar_with_labels(cp, "city", "price_numeric", "City", "Avg Price", text="label", color=ACCENT2),
-                        use_container_width=True)
+                        width="stretch")
 
     st.subheader("⑩ Top 10 Areas by Number of Listings")
     if "breadcrumb_area" in listings.columns:
@@ -613,7 +613,7 @@ if page == "🏠 Overview":
         ac.columns = ["area", "count"]
         ac = add_pct_labels(ac)
         st.plotly_chart(bar_with_labels(ac, "area", "count", "Listings", "Area", orientation="h",
-                                        text="label", height=420), use_container_width=True)
+                                        text="label", height=420), width="stretch")
 
     st.subheader("⑪ Bathrooms Distribution")
     if "bathrooms" in listings.columns:
@@ -621,7 +621,7 @@ if page == "🏠 Overview":
         bc.columns = ["bathrooms", "count"]
         bc = add_pct_labels(bc)
         st.plotly_chart(bar_with_labels(bc, "bathrooms", "count", "Bathrooms", "Listings", text="label", color=ACCENT2),
-                        use_container_width=True)
+                        width="stretch")
 
 
 # =============================================================================
@@ -660,7 +660,7 @@ elif page == "🏙️ City Explorer":
     if "trend_id" in scope_df.columns:
         monthly = trend_line_for(scope_df["trend_id"].dropna().unique(), trend_history)
         if not monthly.empty:
-            st.plotly_chart(price_trend_figure(monthly), use_container_width=True)
+            st.plotly_chart(price_trend_figure(monthly), width="stretch")
         else:
             st.info("No trend history available for this selection.")
 
@@ -674,7 +674,7 @@ elif page == "🏙️ City Explorer":
         gc.columns = ["name", "count"]
         gc = add_pct_labels(gc)
         st.plotly_chart(bar_with_labels(gc, "name", "count", "Listings", None, orientation="h",
-                                        text="label", height=420), use_container_width=True)
+                                        text="label", height=420), width="stretch")
     with c2:
         st.subheader(f"③ Average Price by {group_label}")
         gp = scope_df.dropna(subset=[group_col, "price_numeric"]).groupby(group_col)["price_numeric"].mean()
@@ -682,13 +682,13 @@ elif page == "🏙️ City Explorer":
         gp.columns = ["name", "price_numeric"]
         gp["label"] = gp["price_numeric"].apply(fmt_price_short)
         st.plotly_chart(bar_with_labels(gp, "name", "price_numeric", "Avg Price", None, orientation="h",
-                                        text="label", height=420, color=ACCENT2), use_container_width=True)
+                                        text="label", height=420, color=ACCENT2), width="stretch")
 
     st.subheader("④ Property Type Split")
     if "type" in scope_df.columns:
         tc = scope_df["type"].value_counts().reset_index()
         tc.columns = ["type", "count"]
-        st.plotly_chart(pie_with_labels(tc, "type", "count"), use_container_width=True)
+        st.plotly_chart(pie_with_labels(tc, "type", "count"), width="stretch")
 
     st.subheader("⑤ Price Distribution")
     if scope_df["price_numeric"].notna().any():
@@ -696,7 +696,7 @@ elif page == "🏙️ City Explorer":
         fig.update_traces(texttemplate="%{y}", textposition="outside")
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title="Price (PKR)", yaxis_title="Listings",
                            margin=dict(l=10, r=10, t=10, b=10), height=360)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:
@@ -706,7 +706,7 @@ elif page == "🏙️ City Explorer":
             bp = bp.sort_values("bedrooms")
             bp["label"] = bp["price_numeric"].apply(fmt_price_short)
             st.plotly_chart(bar_with_labels(bp, "bedrooms", "price_numeric", "Bedrooms", "Avg Price", text="label"),
-                            use_container_width=True)
+                            width="stretch")
     with c2:
         title_unit = unit or "Size"
         st.subheader(f"⑦ Average Price by Size ({title_unit})")
@@ -721,7 +721,7 @@ elif page == "🏙️ City Explorer":
                 sb["size_bucket"] = sb["size_bucket"].astype(str)
                 sb["label"] = sb["price_numeric"].apply(fmt_price_short)
                 st.plotly_chart(bar_with_labels(sb, "size_bucket", "price_numeric", f"{title_unit} Range", "Avg Price", text="label"),
-                                use_container_width=True)
+                                width="stretch")
             except Exception:
                 st.info("Not enough size data to build this chart.")
         else:
@@ -752,12 +752,12 @@ elif page == "🏙️ City Explorer":
                                  name="Market Average Line", line=dict(color="#1e293b", dash="dash")))
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title=f"Size ({unit})", yaxis_title="Price (PKR)",
                           margin=dict(l=10, r=10, t=10, b=10), height=440)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.subheader("⑨ 💎 Best Value Listings (priced below market rate for their size)")
         deals = sized[sized["deal_type"] == "Good Deal (below market)"].sort_values("deal_pct").head(10)
         deal_cols = [c for c in ["title", "price_raw", "area_raw", "bedrooms", "deal_pct", "url"] if c in deals.columns]
-        st.dataframe(deals[deal_cols], use_container_width=True, hide_index=True,
+        st.dataframe(deals[deal_cols], width="stretch", hide_index=True,
                     column_config={"url": st.column_config.LinkColumn("Link"), "deal_pct": "% Below Market"})
     else:
         st.info("Not enough data points to detect outliers for this selection.")
@@ -770,7 +770,7 @@ elif page == "🏙️ City Explorer":
         rf_df = pd.DataFrame(rows).sort_values("count", ascending=False)
         rf_df = add_pct_labels(rf_df)
         st.plotly_chart(bar_with_labels(rf_df, "Feature", "count", "Listings", None, orientation="h",
-                                        text="label", height=340), use_container_width=True)
+                                        text="label", height=340), width="stretch")
 
 
 # =============================================================================
@@ -785,14 +785,14 @@ elif page == "🌳 Hierarchy View":
     city_counts.columns = ["city", "count"]
     city_counts = add_pct_labels(city_counts)
     st.plotly_chart(bar_with_labels(city_counts, "city", "count", "City", "Listings", text="label"),
-                    use_container_width=True)
+                    width="stretch")
 
     st.subheader("② Average Price by City")
     cp = listings.dropna(subset=["city", "price_numeric"]).groupby("city")["price_numeric"].mean().reset_index()
     cp["label"] = cp["price_numeric"].apply(fmt_price_short)
     cp = cp.sort_values("price_numeric", ascending=False)
     st.plotly_chart(bar_with_labels(cp, "city", "price_numeric", "City", "Avg Price", text="label", color=ACCENT2),
-                    use_container_width=True)
+                    width="stretch")
 
     st.markdown("---")
     cities = ["All Cities"] + sorted(listings["city"].dropna().unique())
@@ -804,14 +804,14 @@ elif page == "🌳 Hierarchy View":
     ac.columns = ["area", "count"]
     ac = add_pct_labels(ac)
     st.plotly_chart(bar_with_labels(ac, "area", "count", "Listings", None, orientation="h",
-                                    text="label", height=450), use_container_width=True)
+                                    text="label", height=450), width="stretch")
 
     st.subheader(f"④ Average Price by Area in {sel_city}")
     ap = pool.dropna(subset=["breadcrumb_area", "price_numeric"]).groupby("breadcrumb_area")["price_numeric"].mean()
     ap = ap.sort_values(ascending=False).head(15).reset_index()
     ap["label"] = ap["price_numeric"].apply(fmt_price_short)
     st.plotly_chart(bar_with_labels(ap, "breadcrumb_area", "price_numeric", "Avg Price", None, orientation="h",
-                                    text="label", height=450, color=ACCENT2), use_container_width=True)
+                                    text="label", height=450, color=ACCENT2), width="stretch")
 
     st.markdown("---")
     areas = ["All Areas"] + sorted(pool["breadcrumb_area"].dropna().unique())
@@ -824,7 +824,7 @@ elif page == "🌳 Hierarchy View":
     if not sc.empty:
         sc = add_pct_labels(sc)
         st.plotly_chart(bar_with_labels(sc, "subarea", "count", "Listings", None, orientation="h",
-                                        text="label", height=420), use_container_width=True)
+                                        text="label", height=420), width="stretch")
     else:
         st.info("No sub-area breakdown available for this selection.")
 
@@ -834,7 +834,7 @@ elif page == "🌳 Hierarchy View":
     if not sp.empty:
         sp["label"] = sp["price_numeric"].apply(fmt_price_short)
         st.plotly_chart(bar_with_labels(sp, "breadcrumb_subarea", "price_numeric", "Avg Price", None, orientation="h",
-                                        text="label", height=420, color=ACCENT2), use_container_width=True)
+                                        text="label", height=420, color=ACCENT2), width="stretch")
     else:
         st.info("No sub-area price data available for this selection.")
 
@@ -847,7 +847,7 @@ elif page == "🌳 Hierarchy View":
         fig.update_traces(textposition="inside")
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title=None, yaxis_title="Listings",
                           margin=dict(l=10, r=10, t=10, b=10), height=420)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.subheader("⑧ Full Breakdown Table")
     summary = pool.dropna(subset=["breadcrumb_area"]).groupby(
@@ -856,7 +856,7 @@ elif page == "🌳 Hierarchy View":
           avg_trend_pct=("trend_change_pct_overall", "mean")).reset_index().sort_values("listings", ascending=False)
     summary["avg_price"] = summary["avg_price"].apply(fmt_price)
     summary["avg_trend_pct"] = summary["avg_trend_pct"].round(1)
-    st.dataframe(summary, use_container_width=True, hide_index=True, height=400)
+    st.dataframe(summary, width="stretch", hide_index=True, height=400)
 
 
 # =============================================================================
@@ -885,7 +885,7 @@ elif page == "⚖️ Compare Areas":
         fig_cmp.update_layout(template=CHART_TEMPLATE, height=440, yaxis_title="Average Price (PKR)",
                               legend=dict(orientation="h", yanchor="top", y=-0.15, x=0.5, xanchor="center"),
                               margin=dict(l=10, r=10, t=30, b=10), hovermode="x unified")
-        st.plotly_chart(fig_cmp, use_container_width=True)
+        st.plotly_chart(fig_cmp, width="stretch")
 
         st.subheader("② Average Price Comparison")
         rows = [{"Area": a, "Avg Price": pool[pool["breadcrumb_area"] == a]["price_numeric"].mean(),
@@ -893,17 +893,17 @@ elif page == "⚖️ Compare Areas":
         cmp_df = pd.DataFrame(rows)
         cmp_df["label"] = cmp_df["Avg Price"].apply(fmt_price_short)
         st.plotly_chart(bar_with_labels(cmp_df, "Area", "Avg Price", "Area", "Avg Price", text="label"),
-                        use_container_width=True)
+                        width="stretch")
 
         st.subheader("③ Listings Count Comparison")
         cmp_df["pct"] = (cmp_df["Listings"] / cmp_df["Listings"].sum() * 100).round(1)
         cmp_df["label2"] = cmp_df.apply(lambda r: f"{int(r['Listings']):,} ({r['pct']}%)", axis=1)
         st.plotly_chart(bar_with_labels(cmp_df, "Area", "Listings", "Area", "Listings", text="label2", color=ACCENT2),
-                        use_container_width=True)
+                        width="stretch")
 
         st.subheader("④ Full Comparison Table")
         cmp_df["Avg Price"] = cmp_df["Avg Price"].apply(fmt_price)
-        st.dataframe(cmp_df[["Area", "Listings", "Avg Price"]], use_container_width=True, hide_index=True)
+        st.dataframe(cmp_df[["Area", "Listings", "Avg Price"]], width="stretch", hide_index=True)
     else:
         st.info("Select at least one area to compare.")
 
@@ -927,31 +927,31 @@ elif page == "🏆 Area Rankings":
         top = area_stats.sort_values("trend_pct", ascending=False).head(10).copy()
         top["avg_price"] = top["avg_price"].apply(fmt_price)
         st.dataframe(top[["breadcrumb_area", "listings", "avg_price", "trend_pct"]],
-                    use_container_width=True, hide_index=True)
+                    width="stretch", hide_index=True)
     with c2:
         st.subheader("② ❄️ Coolest Areas (lowest growth)")
         low = area_stats.sort_values("trend_pct", ascending=True).head(10).copy()
         low["avg_price"] = low["avg_price"].apply(fmt_price)
         st.dataframe(low[["breadcrumb_area", "listings", "avg_price", "trend_pct"]],
-                    use_container_width=True, hide_index=True)
+                    width="stretch", hide_index=True)
 
     st.subheader("③ 💎 Most Expensive Areas")
     exp = area_stats.sort_values("avg_price", ascending=False).head(15)
     exp = exp.assign(label=exp["avg_price"].apply(fmt_price_short))
     st.plotly_chart(bar_with_labels(exp, "breadcrumb_area", "avg_price", "Avg Price", None, orientation="h",
-                                    text="label", height=450), use_container_width=True)
+                                    text="label", height=450), width="stretch")
 
     st.subheader("④ 💰 Most Affordable Areas")
     aff = area_stats.sort_values("avg_price", ascending=True).head(15)
     aff = aff.assign(label=aff["avg_price"].apply(fmt_price_short))
     st.plotly_chart(bar_with_labels(aff, "breadcrumb_area", "avg_price", "Avg Price", None, orientation="h",
-                                    text="label", height=450, color=ACCENT3), use_container_width=True)
+                                    text="label", height=450, color=ACCENT3), width="stretch")
 
     st.subheader("⑤ 📋 Most Listed Areas")
     listed = area_stats.sort_values("listings", ascending=False).head(15)
     listed = add_pct_labels(listed, "listings")
     st.plotly_chart(bar_with_labels(listed, "breadcrumb_area", "listings", "Listings", None, orientation="h",
-                                    text="label", height=450, color=ACCENT2), use_container_width=True)
+                                    text="label", height=450, color=ACCENT2), width="stretch")
 
     # NEW: Radar comparison
     st.markdown("---")
@@ -979,7 +979,7 @@ elif page == "🏆 Area Rankings":
         fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 1], showticklabels=False)),
                                 height=480, margin=dict(l=40, r=40, t=30, b=30),
                                 legend=dict(orientation="h", yanchor="bottom", y=-0.15))
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.plotly_chart(fig_radar, width="stretch")
         st.caption("Each axis is scaled 0-1 relative to the selected areas — bigger shape = better overall profile")
     else:
         st.info("Select at least 2 areas to compare.")
@@ -1029,7 +1029,7 @@ elif page == "💡 Investment Insights":
         fig.add_vline(x=price_median, line_dash="dot", line_color="gray")
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title="Average Price (PKR)",
                           yaxis_title="Price Growth %", margin=dict(l=10, r=10, t=10, b=10), height=480)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.caption("Bubble size = number of listings · Dotted lines = median price / median growth")
 
         st.subheader("② 💎 Best Buy Areas (below-median price, above-median growth)")
@@ -1037,7 +1037,7 @@ elif page == "💡 Investment Insights":
         best_buys_display = best_buys.copy()
         best_buys_display["avg_price"] = best_buys_display["avg_price"].apply(fmt_price)
         st.dataframe(best_buys_display[["breadcrumb_area", "listings", "avg_price", "trend_pct"]],
-                    use_container_width=True, hide_index=True)
+                    width="stretch", hide_index=True)
 
         c1, c2 = st.columns(2)
         with c1:
@@ -1047,7 +1047,7 @@ elif page == "💡 Investment Insights":
                 cheap_sqft = cheap_sqft.assign(label=cheap_sqft["avg_price_per_sqft"].round(0).astype(int).astype(str))
                 st.plotly_chart(bar_with_labels(cheap_sqft, "breadcrumb_area", "avg_price_per_sqft",
                                                 "PKR/Sqft", None, orientation="h", text="label", height=400),
-                                use_container_width=True)
+                                width="stretch")
             else:
                 st.info("Price/sqft data not available for this scope.")
         with c2:
@@ -1057,7 +1057,7 @@ elif page == "💡 Investment Insights":
                 exp_sqft = exp_sqft.assign(label=exp_sqft["avg_price_per_sqft"].round(0).astype(int).astype(str))
                 st.plotly_chart(bar_with_labels(exp_sqft, "breadcrumb_area", "avg_price_per_sqft",
                                                 "PKR/Sqft", None, orientation="h", text="label", height=400, color=ACCENT2),
-                                use_container_width=True)
+                                width="stretch")
 
         st.subheader("⑤ 🏆 ROI Potential Score (growth-weighted ranking)")
         area_stats["roi_score"] = (normalize(area_stats["trend_pct"]) * 0.7 +
@@ -1068,7 +1068,7 @@ elif page == "💡 Investment Insights":
         roi_display["roi_score"] = roi_display["roi_score"].round(1)
         st.dataframe(roi_display[["breadcrumb_area", "avg_price", "trend_pct", "roi_score"]]
                     .rename(columns={"roi_score": "ROI Score (0-100)"}),
-                    use_container_width=True, hide_index=True)
+                    width="stretch", hide_index=True)
         st.caption("ROI Score blends growth trend (70% weight) and affordability (30% weight) — higher is better")
     else:
         st.info("Not enough data with trend information for this scope.")
@@ -1093,7 +1093,7 @@ elif page == "🛋️ Amenities Impact":
     freq_df = pd.DataFrame(freq_rows).sort_values("count", ascending=False)
     freq_df = add_pct_labels(freq_df)
     st.plotly_chart(bar_with_labels(freq_df, "Amenity", "count", "Listings", None, orientation="h",
-                                    text="label", height=420), use_container_width=True)
+                                    text="label", height=420), width="stretch")
 
     st.subheader("② Price Impact — With vs Without Each Amenity")
     impact_rows = []
@@ -1113,20 +1113,20 @@ elif page == "🛋️ Amenities Impact":
                     color_discrete_sequence=[ACCENT, "#94a3b8"])
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title=None, yaxis_title="Average Price (PKR)",
                           margin=dict(l=10, r=10, t=10, b=10), height=440)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.subheader("③ Which Amenities Add the Most Price Premium?")
         prem = impact_df.assign(label=impact_df["Premium %"].apply(lambda v: f"{v:+.1f}%"))
         st.plotly_chart(bar_with_labels(prem, "Amenity", "Premium %", "Price Premium %", None,
                                         orientation="h", text="label", height=420,
-                                        color=ACCENT), use_container_width=True)
+                                        color=ACCENT), width="stretch")
 
     st.subheader("④ More Amenities = Higher Price?")
     if "amenity_count" in pool.columns:
         amenity_price = pool.dropna(subset=["amenity_count", "price_numeric"]).groupby("amenity_count")["price_numeric"].mean().reset_index()
         amenity_price["label"] = amenity_price["price_numeric"].apply(fmt_price_short)
         st.plotly_chart(bar_with_labels(amenity_price, "amenity_count", "price_numeric",
-                                        "Number of Amenities", "Avg Price", text="label"), use_container_width=True)
+                                        "Number of Amenities", "Avg Price", text="label"), width="stretch")
 
     st.subheader("⑤ Listings Distribution by Number of Amenities")
     if "amenity_count" in pool.columns:
@@ -1134,7 +1134,7 @@ elif page == "🛋️ Amenities Impact":
         ac.columns = ["amenity_count", "count"]
         ac = add_pct_labels(ac)
         st.plotly_chart(bar_with_labels(ac, "amenity_count", "count", "Number of Amenities", "Listings",
-                                        text="label", color=ACCENT2), use_container_width=True)
+                                        text="label", color=ACCENT2), width="stretch")
 
     st.markdown("---")
     st.subheader("🛏️ Room & Space Features")
@@ -1149,7 +1149,7 @@ elif page == "🛋️ Amenities Impact":
             pk_dist.columns = ["parking_spaces", "count"]
             pk_dist = add_pct_labels(pk_dist)
             st.plotly_chart(bar_with_labels(pk_dist, "parking_spaces", "count", "Parking Spaces", "Listings",
-                                            text="label"), use_container_width=True)
+                                            text="label"), width="stretch")
         else:
             st.info("No parking space data available.")
 
@@ -1161,7 +1161,7 @@ elif page == "🛋️ Amenities Impact":
             kc_dist.columns = ["kitchens", "count"]
             kc_dist = add_pct_labels(kc_dist)
             st.plotly_chart(bar_with_labels(kc_dist, "kitchens", "count", "Kitchens", "Listings",
-                                            text="label", color=ACCENT2), use_container_width=True)
+                                            text="label", color=ACCENT2), width="stretch")
         else:
             st.info("No kitchen count data available.")
 
@@ -1177,7 +1177,7 @@ elif page == "🛋️ Amenities Impact":
         rf_df = pd.DataFrame(rows).sort_values("count", ascending=False)
         rf_df = add_pct_labels(rf_df)
         st.plotly_chart(bar_with_labels(rf_df, "Feature", "count", "Listings", None, orientation="h",
-                                        text="label", height=420), use_container_width=True)
+                                        text="label", height=420), width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:
@@ -1188,7 +1188,7 @@ elif page == "🛋️ Amenities Impact":
             comp_df = pd.DataFrame({"Has Servant Quarters": ["Yes", "No"], "price": [with_sq, without_sq]})
             comp_df["label"] = comp_df["price"].apply(fmt_price_short)
             st.plotly_chart(bar_with_labels(comp_df, "Has Servant Quarters", "price", "Servant Quarters", "Avg Price",
-                                            text="label"), use_container_width=True)
+                                            text="label"), width="stretch")
 
     with c2:
         st.subheader("⑩ Built Year Distribution")
@@ -1200,7 +1200,7 @@ elif page == "🛋️ Amenities Impact":
             by_dist.columns = ["period", "count"]
             by_dist = add_pct_labels(by_dist)
             st.plotly_chart(bar_with_labels(by_dist, "period", "count", "Built Period", "Listings", text="label"),
-                            use_container_width=True)
+                            width="stretch")
         else:
             st.info("No built-year data available.")
 
@@ -1228,13 +1228,13 @@ elif page == "⏱️ Market Activity":
         fc.columns = ["freshness", "count"]
         fc = add_pct_labels(fc)
         st.plotly_chart(bar_with_labels(fc, "freshness", "count", "Listing Age", "Listings", text="label"),
-                        use_container_width=True)
+                        width="stretch")
 
     st.subheader("② Freshness Split (Pie)")
     if "freshness" in pool.columns:
         fp = pool["freshness"].value_counts().reindex(FRESHNESS_ORDER).dropna().reset_index()
         fp.columns = ["freshness", "count"]
-        st.plotly_chart(pie_with_labels(fp, "freshness", "count"), use_container_width=True)
+        st.plotly_chart(pie_with_labels(fp, "freshness", "count"), width="stretch")
 
     st.subheader("③ 🔥 Most Active Areas (highest % fresh listings, min 5 listings)")
     if "freshness" in pool.columns and "breadcrumb_area" in pool.columns:
@@ -1247,7 +1247,7 @@ elif page == "⏱️ Market Activity":
         top_active = area_activity.sort_values("fresh_pct", ascending=False).head(15)
         top_active = top_active.assign(label=top_active["fresh_pct"].apply(lambda v: f"{v}%"))
         st.plotly_chart(bar_with_labels(top_active, "breadcrumb_area", "fresh_pct", "% Fresh Listings", None,
-                                        orientation="h", text="label", height=450), use_container_width=True)
+                                        orientation="h", text="label", height=450), width="stretch")
 
     st.subheader("④ Freshness by Property Type")
     if "freshness" in pool.columns and "type" in pool.columns:
@@ -1258,13 +1258,13 @@ elif page == "⏱️ Market Activity":
         fig.update_traces(textposition="inside")
         fig.update_layout(template=CHART_TEMPLATE, xaxis_title=None, yaxis_title="Listings",
                           margin=dict(l=10, r=10, t=10, b=10), height=420)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.subheader("⑤ Freshest Listings Right Now")
     if "days_ago" in pool.columns:
         newest = pool.sort_values("days_ago", na_position="last").head(15)
         cols = [c for c in ["title", "breadcrumb_area", "price_raw", "added_raw", "url"] if c in newest.columns]
-        st.dataframe(newest[cols], use_container_width=True, hide_index=True,
+        st.dataframe(newest[cols], width="stretch", hide_index=True,
                     column_config={"url": st.column_config.LinkColumn("Link")})
 
 
@@ -1305,6 +1305,6 @@ elif page == "🔍 Browse Listings":
         "price_raw", "bedrooms", "bathrooms", "area_raw", "agency_name", "url"
     ] if c in table_data.columns]
 
-    st.dataframe(table_data[display_cols], use_container_width=True, hide_index=True, height=520,
+    st.dataframe(table_data[display_cols], width="stretch", hide_index=True, height=520,
                 column_config={"url": st.column_config.LinkColumn("Link")})
     st.caption(f"Showing {len(table_data):,} of {len(listings):,} total listings")
