@@ -19,6 +19,7 @@ Run:
     streamlit run zameen_dashboard.py
 """
 
+import os
 import re
 import numpy as np
 import streamlit as st
@@ -29,6 +30,8 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Real Estate Analysis", layout="wide", page_icon="🏠")
 
 MASTER_FILE = "zameen_master.xlsx"
+LISTINGS_PARQUET = "zameen_master_listings.parquet"
+TREND_PARQUET = "zameen_master_trend.parquet"
 ACCENT = "#16a34a"
 ACCENT2 = "#dc2626"
 ACCENT3 = "#3b82f6"
@@ -266,12 +269,23 @@ def dominant_unit(df):
 
 @st.cache_data
 def load_data():
-    listings = pd.read_excel(MASTER_FILE, sheet_name="Listings")
-    try:
-        trend_history = pd.read_excel(MASTER_FILE, sheet_name="TrendHistory")
-        trend_history["month_year"] = pd.to_datetime(trend_history["month_year"], errors="coerce")
-    except Exception:
-        trend_history = pd.DataFrame()
+    # Parquet loads in ~0.2s and uses far less memory than the 60+ MB Excel file
+    # (which took ~45s and ~1 GB to read and could crash the app on Streamlit
+    # Cloud). zameen_build_master.py writes both; Excel is only the fallback.
+    if os.path.exists(LISTINGS_PARQUET):
+        listings = pd.read_parquet(LISTINGS_PARQUET)
+        try:
+            trend_history = pd.read_parquet(TREND_PARQUET)
+            trend_history["month_year"] = pd.to_datetime(trend_history["month_year"], errors="coerce")
+        except Exception:
+            trend_history = pd.DataFrame()
+    else:
+        listings = pd.read_excel(MASTER_FILE, sheet_name="Listings")
+        try:
+            trend_history = pd.read_excel(MASTER_FILE, sheet_name="TrendHistory")
+            trend_history["month_year"] = pd.to_datetime(trend_history["month_year"], errors="coerce")
+        except Exception:
+            trend_history = pd.DataFrame()
 
     if "area_raw" in listings.columns:
         parsed = listings["area_raw"].apply(parse_area)
